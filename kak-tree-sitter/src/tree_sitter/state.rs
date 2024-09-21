@@ -13,6 +13,7 @@ use crate::{
     text_objects::OperationMode,
   },
   server::{fifo::Fifo, resources::ServerResources},
+  tree_sitter::indent_guidelines::{IndentGuideline, IndentGuidelines},
 };
 
 use super::{highlighting::KakHighlightRange, languages::Language, nav};
@@ -152,6 +153,11 @@ impl TreeState {
     Ok(())
   }
 
+  // TODO: we eventually want incremental / partial updates, but this is
+  // currently not supported, so we have to rebuild the tree every time. Moving
+  // to incremental updates might change the API, or require another function
+  // to accept deltas.
+  /// Highlight the whole buffer.
   pub fn highlight<'a>(
     &'a mut self,
     lang: &'a Language,
@@ -175,6 +181,49 @@ impl TreeState {
       &lang.hl_names,
       events.flatten(),
     ))
+  }
+
+  /// Compute indent guidelines for the whole buffer.
+  pub fn indent_guidelines(&self, lang: &Language) -> Result<IndentGuidelines, OhNo> {
+    let mut prev_line = 0;
+    let mut prev_col = 0;
+    let mut guide_cols = Vec::default();
+    let mut guidelines = Vec::default();
+
+    let mut cursor = self.tree.walk();
+    loop {
+      let cursor_line = cursor.node().start_position().row;
+      let cursor_col = cursor.node().start_position().column;
+
+      if cursor_line != prev_line {
+        guidelines.push(IndentGuideline::new(prev_line, guide_cols.clone()));
+
+        // we are on a new line; if the column is greater, we can use the
+        // previous column as indent guideline
+        if cursor_col > prev_col {
+          guide_cols.push(prev_col);
+        } else {
+          guide_cols.pop();
+        }
+
+        prev_col = cursor_col;
+      }
+
+      prev_line = cursor_line;
+
+      if !cursor.goto_first_child() {
+        // if there is no children, go on with the next sibling
+        if !cursor.goto_next_sibling() {
+          // if there is no next sibling, go up the parent
+          if !cursor.goto_parent() {
+            // no parent means we have visited everything; abort the loop
+            break;
+          }
+        }
+      }
+    }
+
+    Ok(IndentGuidelines::new(guidelines))
   }
 
   /// Get the text-objects for the given pattern.
