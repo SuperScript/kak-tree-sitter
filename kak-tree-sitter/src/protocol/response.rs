@@ -96,8 +96,12 @@ impl Payload {
   pub fn to_kak(&self) -> String {
     match self {
       Payload::Init { enabled_langs } => {
-        let add_hl =
+        let tree_sitter_hl_ranges =
           "add-highlighter -override buffer/tree-sitter-highlighter ranges tree_sitter_hl_ranges";
+        let tree_sitter_indent_guidelines_ranges =
+          "add-highlighter -override buffer/tree-sitter-indent-guidelines ranges tree_sitter_indent_guidelines_ranges";
+        let tree_sitter_indent_guidelines_hl_ranges =
+          "add-highlighter -override buffer/tree-sitter-indent-guidelines ranges tree_sitter_indent_guidelines_hl_ranges";
         let per_lang = enabled_langs
           .iter()
           .map(|(lang, remove_default_highlighter)| {
@@ -111,7 +115,9 @@ impl Payload {
               "hook -group tree-sitter global WinSetOption tree_sitter_lang={lang} %<
                  {remove_default_hl}
                  tree-sitter-buffer-metadata
-                 {add_hl}
+                 {tree_sitter_hl_ranges}
+                 {tree_sitter_indent_guidelines_ranges}
+                 {tree_sitter_indent_guidelines_hl_ranges}
                  tree-sitter-user-after-highlighter
                >",
             );

@@ -14,6 +14,12 @@ declare-option str tree_sitter_buf_sentinel
 # Highlight ranges used when highlighting buffers.
 declare-option range-specs tree_sitter_hl_ranges
 
+# Replace ranges used for indent guidelines.
+declare-option range-specs tree_sitter_indent_guidelines_ranges
+
+# Highlight ranges used for indent guidelines.
+declare-option range-specs tree_sitter_indent_guidelines_hl_ranges
+
 # Internal verbosity; used when sending requests to KTS.
 declare-option str tree_sitter_verbose '-vvvvv'
 
