@@ -31,7 +31,7 @@ simple_logger = "5"
 thiserror = "1.0"
 tree-sitter = "0.20"
 tree-sitter-highlight = "0.20"
-unicode-segmentation = "1.11"
+unicode-segmentation = "1.12"
 uuid = { version = "1.8.0", features = ["v4"] }
 
 [dev-dependencies]
