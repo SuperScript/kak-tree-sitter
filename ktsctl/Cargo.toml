@@ -19,5 +19,5 @@ dirs = "5.0"
 kak-tree-sitter-config = { version = "2.2.0-dev", path = "../kak-tree-sitter-config" }
 log = "0.4"
 simple_logger = "5"
-thiserror = "1.0"
+thiserror = "2.0"
 unicode-segmentation = "1.11"

@@ -16,5 +16,5 @@ rust-version = "1.70.0"
 dirs = "5.0"
 log = "0.4"
 serde = { version = "1.0", features = ["derive"] }
-thiserror = "1.0.60"
+thiserror = "2.0.3"
 toml = "0.8.12"
